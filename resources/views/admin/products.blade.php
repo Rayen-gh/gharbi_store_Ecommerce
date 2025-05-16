@@ -67,7 +67,7 @@
                                                     </td>
                                                     <td>
                                                         <div class="description">
-                                                            <span class="body-title-2">{{$product->description}}</span>
+                                                            <span class="body-title-2">{{ Str::limit($product->description, 20) }}</span>
                                                         </div>
                                                     </td>
                                                     <td>

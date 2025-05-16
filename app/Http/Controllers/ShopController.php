@@ -14,4 +14,17 @@ class ShopController extends Controller
     $categories = Category::orderBy('created_at', 'desc')->get();
     return view('shop' ,  compact('products' , 'categories'));
   }
+
+ public function product_detail($id)
+{
+    $product = Product::find($id);
+    $categories = Category::get();
+
+    if (!$product) {
+        abort(404, 'Product not found');
+    }
+
+    return view('product-detail', compact('product' , 'categories'));
+}
+
 }

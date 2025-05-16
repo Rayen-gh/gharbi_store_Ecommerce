@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AuthAdmin;
@@ -17,6 +18,7 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/cart',[CartController::class, 'index'])->name('cart.index');
 Route::get('/shop/checkout',[CartController::class, 'checkout'])->name('cart.checkout');
 Route::get('/shop/confirmation',[CartController::class, 'order_confirmation'])->name('cart.confirmation');
+Route::get('/shop/product/{id}', [ShopController::class, 'product_detail'])->name('shop.product.detail');
 
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
@@ -30,6 +32,11 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+
+Route::post('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('cart.add');
+Route::post('/submit-order', [OrderController::class, 'submitOrder'])->name(('order.submit'));
+
+
 
 
 Route::middleware(['auth', AuthAdmin::class])->group(function () {
@@ -46,6 +53,8 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/product/edit/{id}', [AdminController::class, 'edit_product'])->name('admin.product.edit');
     Route::put('/admin/product/update/{id}', [AdminController::class, 'update_product'])->name('admin.product.update');
     Route::delete('/admin/product/delete/{id}', [AdminController::class, 'delete_product'])->name('admin.product.delete');
+
+    Route::get('/admin/orders', [AdminController::class, 'showOrders'])->name('admin.orders');
 
 
     

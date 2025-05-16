@@ -5,6 +5,7 @@
     <section class="shop-checkout container">
       <h2 class="page-title">Order Received</h2>
       <div class="checkout-steps">
+        <!-- Deleting routes mel checkout w confir w cart w tbdlhom ki tvalidi l order-->
         <a href="{{route('cart.index')}}" class="checkout-steps__item active">
           <span class="checkout-steps__item-number">01</span>
           <span class="checkout-steps__item-title">

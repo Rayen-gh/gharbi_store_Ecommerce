@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -222,5 +223,8 @@ class AdminController extends Controller
         }
     }   
 
-    
+    public function showOrders(){
+        $orders = Order::with('orderItems.product')->orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.orders', compact('orders'));
+    }
 }
