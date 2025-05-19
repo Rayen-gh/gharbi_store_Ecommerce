@@ -123,18 +123,8 @@
                                         </li>
                                     </ul>
                                 </li>
-                                <li class="menu-item">
-                                    <a href="slider.html" class="">
-                                        <div class="icon"><i class="icon-image"></i></div>
-                                        <div class="text">Slider</div>
-                                    </a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="coupons.html" class="">
-                                        <div class="icon"><i class="icon-grid"></i></div>
-                                        <div class="text">Coupns</div>
-                                    </a>
-                                </li>
+                               
+                               
 
                                 <li class="menu-item">
                                     <a href="users.html" class="">
@@ -149,7 +139,7 @@
                                         <div class="text">Settings</div>
                                     </a>
                                 </li>
-                                <li class="menu-item">
+                                <li class="menu-item" style="margin-top: 90%">
                                     <form  method="POST" action="{{route('logout')}}" id="logout-form">
                                         @csrf
                                     <button type="button" class="btn btn-danger btn-block" style="font-size: 18px; padding: 15px; border-radius: 10px;" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
@@ -265,8 +255,7 @@
                                                         </div>
                                                         <div class="flex items-center justify-between gap20 flex-grow">
                                                             <div class="name">
-                                                                <a href="product-list.html" class="body-text">Kristin
-                                                                    Watson</a>
+                                                                <a href="product-list.html" class="body-text">{{ Auth::user()->name }}</a>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -382,11 +371,9 @@
                                         <button class="btn btn-secondary dropdown-toggle" type="button"
                                             id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-user wg-user">
-                                                <span class="image">
-                                                    <img src="images/avatar/user-1.png" alt="">
-                                                </span>
+                                              
                                                 <span class="flex flex-column">
-                                                    <span class="body-title mb-2">Kristin Watson</span>
+                                                    <span class="body-title mb-2">{{ Auth::user()->name }}</span>
                                                     <span class="text-tiny">Admin</span>
                                                 </span>
                                             </span>

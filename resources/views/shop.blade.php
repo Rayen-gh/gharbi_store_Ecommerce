@@ -207,7 +207,7 @@
         <div class="products-grid row row-cols-2 row-cols-md-3" id="products-grid">
     @foreach ($products as $product)
         <div class="product-card-wrapper">
-            <form method="POST" action="{{ route('cart.add', ['id' => $product->id]) }}">
+            <form method="POST" action="{{ route('cart.add', ['id' => $product->id]) }}"   class="add-to-cart-form">
                 @csrf
                 <div class="product-card mb-3 mb-md-4 mb-xxl-5">
                     <div class="pc__img-wrapper">
@@ -280,3 +280,25 @@
   </main>
 
 @endsection
+@push('scripts')
+<script>
+document.querySelectorAll('form[action^="/cart/add"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update cart count in all instances
+            document.querySelectorAll('.js-cart-items-count').forEach(span => {
+                span.textContent = data.count;
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
+@endpush

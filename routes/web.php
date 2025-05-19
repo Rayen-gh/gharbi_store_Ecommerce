@@ -10,22 +10,35 @@ use App\Http\Middleware\AuthAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
-Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/cart',[CartController::class, 'index'])->name('cart.index');
-Route::get('/shop/checkout',[CartController::class, 'checkout'])->name('cart.checkout');
-Route::get('/shop/confirmation',[CartController::class, 'order_confirmation'])->name('cart.confirmation');
-Route::get('/shop/product/{id}', [ShopController::class, 'product_detail'])->name('shop.product.detail');
+
+
 
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+    Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
-Route::middleware(['auth'])->group(function () {
+
+#lezem ykoun aaamel auth w verification bech ykoun 3andou access
+Route::middleware(['auth' , 'verified'])->group(function () {
     Route::get('/account-dashboard', [UserController::class, 'index'])->name('user.index');
+    Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/cart',[CartController::class, 'index'])->name('cart.index');
+Route::get('/shop/checkout',[CartController::class, 'checkout'])->name('cart.checkout');
+
+
+Route::get('/order/confirmation/{id}', [OrderController::class, 'confirmation'])
+    ->name('order.confirmation');
+Route::get('/shop/product/{id}', [ShopController::class, 'product_detail'])->name('shop.product.detail');
+
+
 });
+Route::get('/email/verify', function () {
+    return view('auth.verify');
+})->middleware('auth')->name('verification.notice');
+
 
 
 
@@ -35,6 +48,12 @@ Route::get('/login', function () {
 
 Route::post('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/submit-order', [OrderController::class, 'submitOrder'])->name(('order.submit'));
+
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+Route::get('/order/confirmation/{id}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+
+Route::post('/update-cart', [CartController::class ,'update'])->name('cart.update');
+Route::post('/remove-from-cart', [CartController::class ,'remove'])->name('cart.remove');
 
 
 

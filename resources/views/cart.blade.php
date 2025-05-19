@@ -19,7 +19,7 @@
             <em>Checkout Your Items List</em>
           </span>
         </a>
-        <a href="{{route('cart.confirmation')}}" class="checkout-steps__item">
+        <a href="{{ isset($order) ? route('order.confirmation', $order->id) : '#' }}" class="checkout-steps__item">
           <span class="checkout-steps__item-number">03</span>
           <span class="checkout-steps__item-title">
             <span>Confirmation</span>
@@ -59,21 +59,55 @@
             </td>
             <td>
                 <div class="qty-control position-relative">
-                    <input type="number" name="quantity" value="{{ $details['quantity'] }}" min="1" class="qty-control__number text-center">
-                    <div class="qty-control__reduce">-</div>
-                    <div class="qty-control__increase">+</div>
-                </div>
+    <input type="number" name="quantity" data-id="{{ $id }}" value="{{ $details['quantity'] }}" min="1" class="qty-control__number text-center">
+    <div class="custom-qty-reduce">-</div>
+    <div class="custom-qty-increase">+</div>
+</div>
+
+<style>
+.custom-qty-increase, 
+.custom-qty-reduce {
+    position: absolute;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: #f5f5f5;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.custom-qty-reduce {
+    bottom: 5px;
+}
+
+.custom-qty-increase {
+    top: 5px;
+}
+
+.custom-qty-increase:hover,
+.custom-qty-reduce:hover {
+    background: #e0e0e0;
+}
+</style>
             </td>
             <td>
                 <span class="shopping-cart__subtotal">${{ $details['price'] * $details['quantity'] }}</span>
             </td>
             <td>
-                <a href="#" class="remove-cart">
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="#767676" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0.259435 8.85506L9.11449 0L10 0.885506L1.14494 9.74056L0.259435 8.85506Z" />
-                        <path d="M0.885506 0.0889838L9.74057 8.94404L8.85506 9.82955L0 0.97449L0.885506 0.0889838Z" />
-                    </svg>
-                </a>
+              <form action="{{route('cart.remove')}}" method="post">
+                <a href="" type="submit"   class="remove-cart" data-id="{{ $id }}">
+    <svg width="10"  height="10" viewBox="0 0 10 10" fill="#767676" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0.259435 8.85506L9.11449 0L10 0.885506L1.14494 9.74056L0.259435 8.85506Z" />
+        <path d="M0.885506 0.0889838L9.74057 8.94404L8.85506 9.82955L0 0.97449L0.885506 0.0889838Z" />
+    </svg>
+</a>
+</form>
             </td>
         </tr>
         @endforeach
@@ -102,44 +136,40 @@
             <div class="shopping-cart__totals">
               <h3>Cart Totals</h3>
               <table class="cart-totals">
-                <tbody>
-                  <tr>
-                    <th>Subtotal</th>
-                    <td>$1300</td>
-                  </tr>
-                  <tr>
-                    <th>Shipping</th>
-                    <td>
-                      <div class="form-check">
-                        <input class="form-check-input form-check-input_fill" type="checkbox" value=""
-                          id="free_shipping">
-                        <label class="form-check-label" for="free_shipping">Free shipping</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input form-check-input_fill" type="checkbox" value="" id="flat_rate">
-                        <label class="form-check-label" for="flat_rate">Flat rate: $49</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input form-check-input_fill" type="checkbox" value=""
-                          id="local_pickup">
-                        <label class="form-check-label" for="local_pickup">Local pickup: $8</label>
-                      </div>
-                      <div>Shipping to AL.</div>
-                      <div>
-                        <a href="#" class="menu-link menu-link_us-s">CHANGE ADDRESS</a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>VAT</th>
-                    <td>$19</td>
-                  </tr>
-                  <tr>
-                    <th>Total</th>
-                    <td>$1319</td>
-                  </tr>
-                </tbody>
-              </table>
+    @if(session()->has('cart') && count(session('cart')) > 0)
+        <tbody>
+            @php
+                $total = 0;
+            @endphp
+            
+            @foreach (session('cart') as $id => $details)
+                <tr>
+                    <th>{{ $details['quantity'] }} - {{ $details['name'] }}</th>
+                    <td>${{ number_format($details['price'], 2) }}</td>
+                </tr>
+                @php
+                    $total += $details['price'] * $details['quantity'];
+                @endphp
+            @endforeach
+            
+            <tr>
+                <th>Total</th>
+                <td>${{ number_format($total, 2) }}</td>
+            </tr>
+        </tbody>
+    @else
+        <tbody>
+            <tr>
+                <th>Your cart is empty</th>
+                <td></td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td>$0.00</td>
+            </tr>
+        </tbody>
+    @endif
+</table>
             </div>
             <div class="mobile_fixed-btn_wrapper">
               
@@ -150,3 +180,113 @@
     </section>
   </main>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Quantity Controls
+    $('.custom-qty-increase').on('click', function() {
+        const input = $(this).siblings('.qty-control__number');
+        let quantity = parseInt(input.val()) || 1;
+        input.val(quantity + 1).trigger('change');
+    });
+
+    $('.custom-qty-reduce').on('click', function() {
+        const input = $(this).siblings('.qty-control__number');
+        let quantity = parseInt(input.val()) || 2;
+        if (quantity > 1) {
+            input.val(quantity - 1).trigger('change');
+        }
+    });
+
+    // Handle quantity changes
+    $('.qty-control__number').on('change', function() {
+        const input = $(this);
+        const productId = input.data('id');
+        const quantity = parseInt(input.val()) || 1;
+        const price = parseFloat(input.closest('tr').find('.shopping-cart__product-price').text().replace('$', ''));
+        
+        // Update subtotal
+        const subtotal = price * quantity;
+        input.closest('tr').find('.shopping-cart__subtotal').text('$' + subtotal.toFixed(2));
+        
+        // Update cart via AJAX
+        $.ajax({
+            url: '/update-cart',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: productId,
+                quantity: quantity
+            },
+            success: function(response) {
+                recalculateCart();
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('Error updating cart');
+            }
+        });
+    });
+
+    // Remove item
+    $('.remove-cart').on('click', function(e) {
+        e.preventDefault();
+        const productId = $(this).data('id');
+        const row = $(this).closest('tr');
+        
+        $.ajax({
+            url: '/remove-from-cart',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: productId
+            },
+            success: function(response) {
+                row.remove();
+                recalculateCart();
+                if ($('.cart-table tbody tr').length === 0) {
+                    location.reload();
+                }
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('Error removing item');
+            }
+        });
+    });
+
+    // Cart calculations
+    function recalculateCart() {
+        let total = 0;
+        
+        $('.cart-table tbody tr').each(function() {
+            const subtotal = parseFloat($(this).find('.shopping-cart__subtotal').text().replace('$', ''));
+            total += subtotal;
+        });
+        
+        $('.cart-totals tr:last-child td').text('$' + total.toFixed(2));
+        updateCartTotalsItems();
+    }
+
+    function updateCartTotalsItems() {
+        $('.cart-totals tbody tr:not(:last-child)').remove();
+        let itemsHtml = '';
+        
+        $('.cart-table tbody tr').each(function() {
+            const name = $(this).find('.shopping-cart__product-item__detail h4').text();
+            const quantity = $(this).find('.qty-control__number').val();
+            const subtotal = $(this).find('.shopping-cart__subtotal').text();
+            
+            itemsHtml += `
+                <tr>
+                    <th>${quantity} × ${name}</th>
+                    <td>${subtotal}</td>
+                </tr>
+            `;
+        });
+        
+        $('.cart-totals tbody').prepend(itemsHtml);
+    }
+});
+</script>
+@endpush

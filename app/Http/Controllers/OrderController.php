@@ -46,6 +46,23 @@ class OrderController extends Controller
     // Step 5: Clear session cart
     session()->forget('cart');
 
-    return redirect()->route('cart.confirmation')->with('success', 'Order placed successfully!');
+    return redirect()->route('order.confirmation', ['id' => $order->id])
+        ->with('success', 'Order placed successfully!');
 }
+
+public function confirmation($orderId)
+{
+    $order = Order::with('items.product')->findOrFail($orderId);
+    return view('confirmation', compact('order'));
+}
+
+ public function show(Order $order)
+    {
+        // Add authorization check
+        $this->authorize('view', $order);
+
+        return view('orders.show', [
+            'order' => $order->load('items.product')
+        ]);
+    }
 }
