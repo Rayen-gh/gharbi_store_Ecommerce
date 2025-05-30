@@ -13,22 +13,16 @@ return new class extends Migration
 {
     Schema::create('products', function (Blueprint $table) {
         $table->id();
-        $table->string('name');
-        $table->text('description');
-        $table->integer('quantity');
-        $table->decimal('price', 8, 2);
-        $table->string('image')->nullable();
+$table->string('title');
+$table->text('description');
+$table->integer('quantity')->default(0); // add default if needed
+$table->decimal('price', 15, 2);
+$table->json('images')->nullable(); // replaces string 'image'
+$table->unsignedBigInteger('category_id')->nullable();
+$table->string('category_name')->nullable();
+$table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+$table->timestamps();
 
-        // ✅ First define the column
-        $table->unsignedBigInteger('category_id');
-
-        // ✅ Then apply the foreign key constraint
-        $table->foreign('category_id')
-              ->references('id')
-              ->on('categories')
-              ->onDelete('cascade');
-
-        $table->timestamps();
     });
 }
 

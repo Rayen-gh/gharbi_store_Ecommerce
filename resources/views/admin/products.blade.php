@@ -46,7 +46,7 @@
                                                    <th>Description</th>
                                                    <th>Image</th>
                                                    <th>Quantity</th>
-                                                   <th>Category</th>
+                                                   <!--<th>Category</th>-->
                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
@@ -57,7 +57,7 @@
                                                     <td class="pname">
                                                         
                                                         <div class="name">
-                                                            <a href="#" class="body-title-2">{{$product->name}}</a>
+                                                            <a href="#" class="body-title-2">{{$product->title}}</a>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -71,20 +71,45 @@
                                                         </div>
                                                     </td>
                                                     <td>
-<img src="{{asset('uploads/products')}}/{{$product->image}}" alt="{{$product->name}}" class="image">
-
-
-                                                    </td>
+                                @if($product->display_image)
+                                    @if(filter_var($product->display_image, FILTER_VALIDATE_URL))
+                                        {{-- External URL image --}}
+                                        <img src="{{$product->display_image}}" 
+                                             alt="{{$product->title}}" 
+                                             class="image" 
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                             onerror="this.src='https://placehold.co/60x60?text=No+Image'">
+                                    @else
+                                        {{-- Local file image --}}
+                                        <img src="{{asset('uploads/products/' . $product->display_image)}}" 
+                                             alt="{{$product->title}}" 
+                                             class="image" 
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                             onerror="this.src='https://placehold.co/60x60?text=No+Image'">
+                                    @endif
+                                @else
+                                    {{-- Fallback placeholder --}}
+                                    <img src="https://placehold.co/60x60?text=No+Image" 
+                                         alt="No Image" 
+                                         class="image" 
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                @endif
+                                
+                                {{-- Show multiple images indicator if product has more than one image --}}
+                                @if(count($product->image_urls) > 1)
+                                    <small class="text-muted d-block mt-1">+{{ count($product->image_urls) - 1 }} more</small>
+                                @endif
+                            </td>
                                                     <td>
                                                         <div class="quantity">
                                                             <span class="body-title-2">{{$product->quantity}}</span>
                                                         </div>
                                                     </td>
-                                                    <td>
-                                                        <div class="category">
-                                                            <span class="body-title-2">{{$product->category->name}}</span>
+                                                   <!--  <td>
+                                                        <<div class="category">
+                                                            <span class="body-title-2">$product->category->name</span>
                                                         </div>
-                                                    </td>
+                                                    </td> -->
                                                      
                                                     <td>
                                                         <div class="list-icon-function">

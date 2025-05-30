@@ -215,8 +215,34 @@
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide">
                                     <a href="{{ route('shop.product.detail', $product->id) }}">
-                                        <img loading="lazy" src="{{ asset('uploads/products/' . $product->image) }}" width="330" height="400" alt="{{ $product->name }}" class="pc__img">
-                                    </a>
+@if($product->display_image)
+                                    @if(filter_var($product->display_image, FILTER_VALIDATE_URL))
+                                        {{-- External URL image --}}
+                                        <img src="{{$product->display_image}}" 
+                                             alt="{{$product->title}}" 
+                                             class="image" 
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                             onerror="this.src='https://placehold.co/60x60?text=No+Image'">
+                                    @else
+                                        {{-- Local file image --}}
+                                        <img src="{{asset('uploads/products/' . $product->display_image)}}" 
+                                             alt="{{$product->title}}" 
+                                             class="image" 
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                             onerror="this.src='https://placehold.co/60x60?text=No+Image'">
+                                    @endif
+                                @else
+                                    {{-- Fallback placeholder --}}
+                                    <img src="https://placehold.co/60x60?text=No+Image" 
+                                         alt="No Image" 
+                                         class="image" 
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                @endif
+                                
+                                {{-- Show multiple images indicator if product has more than one image --}}
+                                @if(count($product->image_urls) > 1)
+                                    <small class="text-muted d-block mt-1">+{{ count($product->image_urls) - 1 }} more</small>
+                                @endif                                    </a>
                                 </div>
                             </div>
                         </div>

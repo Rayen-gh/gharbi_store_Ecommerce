@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\ProductApiService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use intervention\Image\Laravel\Facades\Image;
@@ -110,11 +111,29 @@ class AdminController extends Controller
     }
 
 
+    
 
+protected ProductApiService $productApiService;
+public function __construct(ProductApiService $productApiService)
+    {
+        $this->productApiService = $productApiService;
+    }
     //produits 
     public function products(){
         $products = Product::orderBy('created_at', 'desc')->paginate(10);
         return view('admin.products', compact('products'));
+    }
+     public function syncProducts()
+    {
+        try {
+            $result = $this->productApiService->syncProducts();
+            
+            return redirect()->back()->with('success', 
+                "Products synced successfully! Saved: {$result['saved']}, Updated: {$result['updated']}"
+            );
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to sync products: ' . $e->getMessage());
+        }
     }
 
     // add product 
